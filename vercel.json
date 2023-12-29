@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "public": false,
+  "builds": [
+    {
+      "src": "productos-module/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "pujas-module/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "usuarios-module/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "carbono-module/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "email-module/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/api/v2/productos(.*)$",
+      "dest": "productos-module/index.js"
+    },
+    {
+      "src": "^/api/v2/pujas(.*)$",
+      "dest": "pujas-module/index.js"
+    },
+    {
+      "src": "^/api/v2/usuarios(.*)$",
+      "dest": "usuarios-module/index.js"
+    },
+    {
+      "src": "^/api/v2/carbono(.*)$",
+      "dest": "carbono-module/index.js"
+    },
+    {
+      "src": "^/api/v2/email(.*)$",
+      "dest": "email-module/index.js"
+    }
+  ]
+}
