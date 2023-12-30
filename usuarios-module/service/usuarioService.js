@@ -72,6 +72,55 @@ class ServiceUsuario {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    async createOrUpdateUsuarioFromGoogle(token) {
+        try {
+            const data = await this.getDataFromGoogleToken(token);
+            const usuario = await this.getUsuarioByCorreo(data.res.email);
+            let result;
+            if (usuario === [] || usuario === null) {
+                result = await Usuario.create(
+                    {
+                        nombre: data.res.name,
+                        correo: data.res.email,
+                        imagen: data.res.picture
+                    }
+                )
+            } else {
+                if (usuario.imagen !== null|| usuario.imagen === data.picture) {
+
+                    result = await Usuario.findOneAndUpdate({correo: data.res.email}, { imagen: data.res.picture },
+                        { new: true });
+                } else {
+                    result = usuario;
+                }
+            }
+            return {status: 200, res: result.correo};
+        } catch (error) {
+            return {status: 401, res: error};
+        }
+    }
+
+    async getDataFromGoogleToken(token) {
+        const response = await axios.get('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + token);
+        return {status: response.status, res: response.data};
+
+    }
+
+    async verifyGoogleToken(googleToken) {
+        try {
+            let response = await axios.get('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + googleToken);
+            if(response.status === 200){
+                return {status: 200, res: {token:googleToken, exp:response.data.exp}}
+            }else{
+                return {status: 401, res: "El token de sesión no es válido"}
+            }
+        }
+        catch (error) {
+            console.error('Error al verificar el token de Google:', error);
+            return {status: 401, res: "Token no valido"};
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     async valorar(valoracion, usuarioValorado, usuarioValorador, producto){
         const foundValorador = await Usuario.findOne({correo: usuarioValorador})

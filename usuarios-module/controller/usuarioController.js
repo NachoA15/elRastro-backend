@@ -1,6 +1,7 @@
 const ServiceUsuario = require('../service/usuarioService');
 const serviceUsuario = new ServiceUsuario();
 
+let cache = [];
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const createUsuarioController = async (req, res, next) => {
@@ -69,6 +70,54 @@ const updateUsuarioController = async (req, res, next) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const checkTokenInCache =  (tokenToCheck) => {
+    const tokenIndex = cache.findIndex(([token, caducidad]) => token === tokenToCheck)
+    if (tokenIndex !== -1) {
+        const [, caducidad] = cache[tokenIndex];
+        if(caducidad < new Date().getTime()/1000){
+            cache.splice(tokenIndex, 1);
+            throw new Error("Caducado");
+        }else{
+            return "ok"
+        }
+    }else{
+        throw new Error("No esta en la cache");
+    }
+}
+
+const checkToken = async (req, res, next) => {
+    try{
+        const tokenToCheck = req.headers.authorization
+        const tokenIndex = cache.findIndex(([token, caducidad]) => token === tokenToCheck)
+
+        if (tokenIndex !== -1) {
+            const [, caducidad] = cache[tokenIndex];
+            if(caducidad < new Date().getTime()){
+                cache.splice(tokenIndex, 1);
+                res.status(401).send("Caducado");
+            }else{
+                let user = await serviceUsuario.getDataFromGoogleToken(tokenToCheck);
+                res.status(200).send({email: user.res.email, token: tokenToCheck});
+            }
+        } else {
+            const isValid = await serviceUsuario.verifyGoogleToken(tokenToCheck);
+            if(isValid.status === 200){
+                let user = await serviceUsuario.createOrUpdateUsuarioFromGoogle(isValid.res.token);
+                cache.push([isValid.res.token, parseInt(isValid.res.exp)]);
+                res.status(isValid.status).send({email: user.res, token: tokenToCheck});
+            }else{
+                res.status(401).send("No autorizado");
+            }
+
+        }
+
+    }catch (error) {
+        throw new Error(`Error al agregar el token a la caché: ${error.message}`);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const updateValoracionController = async (req, res, next) => {
     try{
         const response = await serviceUsuario.checkValoracion(req.body.valorado, req.body.valorador, req.body.producto)
@@ -111,5 +160,7 @@ module.exports = {
     updateUsuarioController,
     updateValoracionController,
     getRatingUsuarioController,
-    getValoracionUsuarioController
+    getValoracionUsuarioController,
+    checkToken,
+    checkTokenInCache
 }

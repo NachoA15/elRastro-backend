@@ -1,6 +1,6 @@
 const express = require('express')
-const { createUsuarioController, getUsuarioByIdController, deleteUsuarioController, updateUsuarioController,
-    updateValoracionController, getRatingUsuarioController, getValoracionUsuarioController
+const { checkToken, createUsuarioController, getUsuarioByIdController, deleteUsuarioController, updateUsuarioController,
+    updateValoracionController, getRatingUsuarioController, getValoracionUsuarioController, checkTokenInCache
 } = require('../controller/usuarioController')
 
 const routerUsuario = express.Router()
@@ -12,6 +12,8 @@ routerUsuario.put('/', updateUsuarioController)
 routerUsuario.put('/valoracion', updateValoracionController)
 routerUsuario.get('/valoracionMedia', getRatingUsuarioController)
 routerUsuario.get('/valoracion', getValoracionUsuarioController)
+routerUsuario.post('/checkToken',checkToken)
+routerUsuario.get('/checkLocalCache', checkTokenInCache )
 
 module.exports = {
     routerUsuario
