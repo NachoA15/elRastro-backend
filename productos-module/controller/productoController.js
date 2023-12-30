@@ -51,7 +51,7 @@ const guardarProducto = async(req, res) => {
 
         if (typeof req.body.id !== "undefined" && req.body.id !== null && req.body.id !== '') {
             const check = await  serviceProducto.checkProductoActualizable(req.body.id);
-            if (check !== 'ok' && typeof req.body.puja === 'undefined') {
+            if (check !== 'ok') {
                 res.status(409).send({message: check});
             } else {
                 const producto = await serviceProducto.update(
@@ -62,7 +62,8 @@ const guardarProducto = async(req, res) => {
                     req.body.precioInicial,
                     req.body.fechaCierre,
                     req.body.imagen,
-                    req.body.puja
+                    req.body.puja,
+                    req.body.pagado
                 );
                 res.status(200).send({message: 'Producto ' + req.body.id + ' actualizado con éxito', producto: producto});
             }

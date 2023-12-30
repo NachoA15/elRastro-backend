@@ -186,6 +186,7 @@ class ServiceProducto {
                 fechaCierre: fechaCierre,
                 descripcion: descripcion,
                 imagen: imagen,
+                pagado: false,
                 puja: {}
             }
         );
@@ -198,14 +199,15 @@ class ServiceProducto {
     async checkProductoActualizable(id) {
         const producto = await this.findById(id);
         // COMPROBAR SI CUANDO SE ELIMINA ALGUNA PUJA LA CONDICIÓN SIGUE SIENDO VERDAD
-        if (!producto.puja || typeof producto.puja === 'undefined' || producto.puja === {}) {
+        console.log(producto.pagado)
+        if (!producto.puja || typeof producto.puja === 'undefined' || producto.puja === {} || !producto.pagado) {
             return 'ok';
         } else {
             return 'No se puede actualizar el producto ' + id + ' porque ya han pujado sobre él';
         }
     }
 
-    async update(id, nombre, direccion, descripcion, precioInicial, fechaCierre, imagen, puja) {
+    async update(id, nombre, direccion, descripcion, precioInicial, fechaCierre, imagen, puja, pagado) {
         const res = await Producto.findByIdAndUpdate(id,
             {
                 nombre: nombre,
@@ -214,9 +216,10 @@ class ServiceProducto {
                 precioInicial: precioInicial,
                 fechaCierre: fechaCierre,
                 imagen: imagen,
-                puja: puja
+                puja: puja,
+                pagado: pagado
             },
-    {
+            {
                 returnOriginal: true
             }
         );
