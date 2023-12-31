@@ -7,6 +7,14 @@ const axios = require("axios");
 
 const listarProductos = async(req, res) => {
     try {
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else{
         if (typeof req.params.id !== 'undefined' && req.params.id !== null && req.params.id !== '') {
             const producto = await serviceProducto.findById(req.params.id);
             res.status(200).send({producto: producto});
@@ -16,29 +24,52 @@ const listarProductos = async(req, res) => {
         } else {
             const productos = await serviceProducto.findAll();
             res.status(200).send({productos: productos});
-        }
+        }}
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
     }
+
 }
 
 const filtrarProductos = async(req, res) => {
     try {
-        const productos = await serviceProducto.filterProductos(req.body.usuario, req.body.texto, req.body.orden);
-        res.status(200).send({productos: productos});
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            const productos = await serviceProducto.filterProductos(req.body.usuario, req.body.texto, req.body.orden);
+            res.status(200).send({productos: productos});
+        }
     } catch (error) {
-        res.status(500).send({success: false, message: error.message});
+        if(error.message === "Request failed with status code 401"){
+            res.status(401).send({success: false, message: "No autorizado"});
+        }else{
+            res.status(500).send({success: false, message: error.message});
+        }
     }
 }
 
 const listarProductosPorPujasUsuario = async(req, res) => {
     try {
-        const pujas = await axios.get(`http://localhost:5002/api/v2/pujas?usuario=${req.query.usuario}`)
-            .then((result) => {
-                return result.data.pujas;
-            });
-        const productosByPujas = await serviceProducto.findByPujasUsuario(pujas);
-        res.status(200).send({productos: productosByPujas});
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            const pujas = await axios.get(`http://localhost:5002/api/v2/pujas?usuario=${req.query.usuario}`)
+                .then((result) => {
+                    return result.data.pujas;
+                });
+            const productosByPujas = await serviceProducto.findByPujasUsuario(pujas);
+            res.status(200).send({productos: productosByPujas});
+        }
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
     }
@@ -48,49 +79,60 @@ const listarProductosPorPujasUsuario = async(req, res) => {
 
 const guardarProducto = async(req, res) => {
     try {
-
-        if (typeof req.body.id !== "undefined" && req.body.id !== null && req.body.id !== '') {
-            const check = await  serviceProducto.checkProductoActualizable(req.body.id);
-            if (check !== 'ok') {
-                res.status(409).send({message: check});
-            } else {
-                const producto = await serviceProducto.update(
-                    req.body.id,
-                    req.body.nombre,
-                    req.body.direccion,
-                    req.body.descripcion,
-                    req.body.precioInicial,
-                    req.body.fechaCierre,
-                    req.body.imagen,
-                    req.body.puja,
-                    req.body.pagado
-                );
-                res.status(200).send({message: 'Producto ' + req.body.id + ' actualizado con éxito', producto: producto});
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
             }
-        } else {
-            const usuario = await axios.get(`http://localhost:5003/api/v2/usuarios?correo=${req.body.usuario}`)
-                .then((result) => {
-                    return result.data;
-                })
-
-            if(usuario === null || typeof usuario === 'undefined'){
-                res.status(400).send("El usuario no existe")
-            }else{
-                const check = await serviceProducto.checkProducto(req.body.nombre, req.body.usuario);
-
-                if (check !== 'ok'){
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            if (typeof req.body.id !== "undefined" && req.body.id !== null && req.body.id !== '') {
+                const check = await serviceProducto.checkProductoActualizable(req.body.id);
+                if (check !== 'ok') {
                     res.status(409).send({message: check});
                 } else {
-                    const producto = await serviceProducto.create(
+                    const producto = await serviceProducto.update(
+                        req.body.id,
                         req.body.nombre,
                         req.body.direccion,
-                        req.body.usuario,
+                        req.body.descripcion,
                         req.body.precioInicial,
                         req.body.fechaCierre,
-                        req.body.descripcion,
-                        req.body.imagen
-                    )
-                    res.status(201).send({message: 'Producto creado con éxito', producto: producto});
+                        req.body.imagen,
+                        req.body.puja,
+                        req.body.pagado
+                    );
+                    res.status(200).send({
+                        message: 'Producto ' + req.body.id + ' actualizado con éxito',
+                        producto: producto
+                    });
+                }
+            } else {
+                const usuario = await axios.get(`http://localhost:5003/api/v2/usuarios?correo=${req.body.usuario}`)
+                    .then((result) => {
+                        return result.data;
+                    })
+
+                if (usuario === null || typeof usuario === 'undefined') {
+                    res.status(400).send("El usuario no existe")
+                } else {
+                    const check = await serviceProducto.checkProducto(req.body.nombre, req.body.usuario);
+
+                    if (check !== 'ok') {
+                        res.status(409).send({message: check});
+                    } else {
+                        const producto = await serviceProducto.create(
+                            req.body.nombre,
+                            req.body.direccion,
+                            req.body.usuario,
+                            req.body.precioInicial,
+                            req.body.fechaCierre,
+                            req.body.descripcion,
+                            req.body.imagen
+                        )
+                        res.status(201).send({message: 'Producto creado con éxito', producto: producto});
+                    }
                 }
             }
         }
@@ -103,6 +145,14 @@ const guardarProducto = async(req, res) => {
 
 const borrarProducto = async (req, res) => {
     try {
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else{
         const producto = await serviceProducto.delete(req.params.id);
         if (producto) {
             await axios.delete(`http://localhost:5002/api/v2/pujas?producto=${req.params.id}`);
@@ -110,6 +160,7 @@ const borrarProducto = async (req, res) => {
         } else {
             res.status(400).send({message: 'No existe el producto ' + req.params.id});
         }
+    }
 
     } catch (error) {
         res.status(500).send({success: false, message: error.message});
@@ -120,18 +171,27 @@ const borrarProducto = async (req, res) => {
 
 const reabrirSubastas = async () => {
     try{
-        const productos = await serviceProducto.findSubastasCerradas();
-        for(const producto of productos){
-            if(!producto.puja){
-                const duracion = producto.fechaCierre - producto.fechaInicio;
-                const nuevaFechaCierre = new Date();
-                nuevaFechaCierre.setTime(nuevaFechaCierre.getTime() + duracion);
-                const nuevoPrecio = Math.round(producto.precioInicial * 0.9 * 100) / 100;
-                await serviceProducto.periodicUpdate(
-                    producto.id,
-                    nuevoPrecio,
-                    nuevaFechaCierre
-                );
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            const productos = await serviceProducto.findSubastasCerradas();
+            for (const producto of productos) {
+                if (!producto.puja) {
+                    const duracion = producto.fechaCierre - producto.fechaInicio;
+                    const nuevaFechaCierre = new Date();
+                    nuevaFechaCierre.setTime(nuevaFechaCierre.getTime() + duracion);
+                    const nuevoPrecio = Math.round(producto.precioInicial * 0.9 * 100) / 100;
+                    await serviceProducto.periodicUpdate(
+                        producto.id,
+                        nuevoPrecio,
+                        nuevaFechaCierre
+                    );
+                }
             }
         }
     } catch (error) {

@@ -116,7 +116,7 @@ class ServiceUsuario {
             }
         }
         catch (error) {
-            console.error('Error al verificar el token de Google:', error);
+            console.error('Error al verificar el token de Google');
             return {status: 401, res: "Token no valido"};
         }
     }

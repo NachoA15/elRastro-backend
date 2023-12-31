@@ -1,6 +1,8 @@
 const ServiceUsuario = require('../service/usuarioService');
 const serviceUsuario = new ServiceUsuario();
 
+const axios = require("axios");
+
 let cache = [];
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -27,16 +29,24 @@ const createUsuarioController = async (req, res, next) => {
 
 const getUsuarioByIdController = async (req, res, next) => {
     try{
-        if(req.query.nombre){
-            usuario = await serviceUsuario.getUsuarioByNombre(req.query.nombre)
-        }else if(req.query.correo){
-            usuario = await serviceUsuario.getUsuarioByCorreo(req.query.correo)
-        }else{
-            usuario = await serviceUsuario.getUsuarios()
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            if (req.query.nombre) {
+                usuario = await serviceUsuario.getUsuarioByNombre(req.query.nombre)
+            } else if (req.query.correo) {
+                usuario = await serviceUsuario.getUsuarioByCorreo(req.query.correo)
+            } else {
+                usuario = await serviceUsuario.getUsuarios()
+            }
+
+            res.status(200).send(usuario);
         }
-
-        res.status(200).send(usuario);
-
     }catch(error){
         res.status(500).send({success: false, message: error.message});
     }
@@ -70,18 +80,28 @@ const updateUsuarioController = async (req, res, next) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const checkTokenInCache =  (tokenToCheck) => {
-    const tokenIndex = cache.findIndex(([token, caducidad]) => token === tokenToCheck)
+const checkTokenInCache =  async (req, res, next) => {
+    const tokenIndex = cache.findIndex(([token, caducidad]) => token === req.headers.authorization)
     if (tokenIndex !== -1) {
         const [, caducidad] = cache[tokenIndex];
         if(caducidad < new Date().getTime()/1000){
             cache.splice(tokenIndex, 1);
-            throw new Error("Caducado");
+            return res.status(401).send("Token Caducado");
         }else{
-            return "ok"
+            return res.status(200).send("OK");
         }
     }else{
-        throw new Error("No esta en la cache");
+        return res.status(401).send("Token no encontrado");
+    }
+}
+
+const logOut = async (req, res, next) => {
+    const tokenIndex = cache.findIndex(([token, caducidad]) => token === req.headers.authorization)
+    if (tokenIndex !== -1) {
+        cache.splice(tokenIndex, 1);
+        return res.status(200).send("OK");
+    }else{
+        return res.status(401).send("Token no encontrado");
     }
 }
 
@@ -120,12 +140,19 @@ const checkToken = async (req, res, next) => {
 
 const updateValoracionController = async (req, res, next) => {
     try{
-        const response = await serviceUsuario.checkValoracion(req.body.valorado, req.body.valorador, req.body.producto)
-        if(response !== "ok"){
-            res.status(400).send(response);
-        }else{
-            const usuario = await serviceUsuario.valorar(req.body.valoracion, req.body.valorado, req.body.valorador, req.body.producto)
-            res.status(200).send({usuario: usuario});
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200) {
+            const response = await serviceUsuario.checkValoracion(req.body.valorado, req.body.valorador, req.body.producto)
+            if (response !== "ok") {
+                res.status(400).send(response);
+            } else {
+                const usuario = await serviceUsuario.valorar(req.body.valoracion, req.body.valorado, req.body.valorador, req.body.producto)
+                res.status(200).send({usuario: usuario});
+            }
         }
     }catch(error){
         res.status(500).send({success: false, message: error.message});
@@ -134,8 +161,17 @@ const updateValoracionController = async (req, res, next) => {
 
 const getRatingUsuarioController = async (req, res, next) => {
     try{
-        const media = await serviceUsuario.getValoracionMedia(req.query.correo)
-        res.status(200).send({usuario: media});
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            const media = await serviceUsuario.getValoracionMedia(req.query.correo)
+            res.status(200).send({usuario: media});
+        }
     }catch(error){
         res.status(500).send({success: false, message: error.message});
     }
@@ -144,8 +180,17 @@ const getRatingUsuarioController = async (req, res, next) => {
 
 const getValoracionUsuarioController = async (req, res, next) => {
     try{
-        const valoracion = await serviceUsuario.getValoracion(req.query.correo)
-        res.status(200).send({usuario: valoracion});
+        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+            headers: {
+                'authorization': req.headers.authorization
+            }
+        })
+        if(checkToken.status !== 200){
+            res.status(checkToken.status).send(checkToken.data)
+        }else {
+            const valoracion = await serviceUsuario.getValoracion(req.query.correo)
+            res.status(200).send({usuario: valoracion});
+        }
     }catch(error){
         res.status(500).send({success: false, message: error.message});
     }
@@ -162,5 +207,6 @@ module.exports = {
     getRatingUsuarioController,
     getValoracionUsuarioController,
     checkToken,
-    checkTokenInCache
+    checkTokenInCache,
+    logOut
 }
