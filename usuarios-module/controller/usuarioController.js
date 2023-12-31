@@ -81,6 +81,7 @@ const updateUsuarioController = async (req, res, next) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const checkTokenInCache =  async (req, res, next) => {
+    console.log("Contenido cache: " + cache);
     const tokenIndex = cache.findIndex(([token, caducidad]) => token === req.headers.authorization)
     if (tokenIndex !== -1) {
         const [, caducidad] = cache[tokenIndex];
