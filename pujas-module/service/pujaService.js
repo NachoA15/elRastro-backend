@@ -62,7 +62,7 @@ class ServicePuja {
      */
     async checkPuja(usuario, cantidad, producto, token) {
         const pujasProducto = await this.findByProduct(producto);
-        const foundProducto = await axios.get(`http://localhost:5001/api/v2/productos/${producto}`, {
+        const foundProducto = await axios.get(`https://el-rastro-a7-backend.vercel.app/api/v2/productos/${producto}`, {
             headers: {
                 'authorization': token
             }

@@ -4,7 +4,7 @@ const serviceCarbono = new ServiceCarbono();
 const axios = require("axios");
 const getCoordinatesFromPostalCode = async (req, res, next) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -22,7 +22,7 @@ const getCoordinatesFromPostalCode = async (req, res, next) => {
 
 const getHuellaCarbono = async (req, res) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }

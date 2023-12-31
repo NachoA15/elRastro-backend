@@ -198,8 +198,7 @@ class ServiceProducto {
 
     async checkProductoActualizable(id) {
         const producto = await this.findById(id);
-        // COMPROBAR SI CUANDO SE ELIMINA ALGUNA PUJA LA CONDICIÓN SIGUE SIENDO VERDAD
-        console.log(producto.pagado)
+
         if (!producto.puja || typeof producto.puja === 'undefined' || producto.puja === {} || !producto.pagado) {
             return 'ok';
         } else {

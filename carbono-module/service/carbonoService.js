@@ -7,7 +7,6 @@ class ServiceCarbono {
         const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${codPostal}.json?country=es&types=postcode&language=es&access_token=${process.env.MAPBOX_TOKEN}&limit=1`);
         const json = await response.json();
         const coordenadas = json.features[0].geometry.coordinates;
-        //console.log(coordenadas)
         return {lat: coordenadas[1].toString(), long: coordenadas[0].toString()};
     }
 
@@ -28,7 +27,6 @@ class ServiceCarbono {
         };
 
         const response = await axios.request(options);
-        //console.log(response.data.body.distance.kilometers);
         return response.data.body.distance.kilometers;
     }
 
@@ -53,7 +51,6 @@ class ServiceCarbono {
 
         const response = await axios.request(options);
 
-        //console.log(response.data);
         return response.data;
     }
 }

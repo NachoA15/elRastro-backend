@@ -60,7 +60,7 @@ class ServiceUsuario {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     async deleteUsuario(correo, token) {
-        const productos = await axios.get(`http://localhost:5001/api/v2/productos?usuario=${correo}`, {
+        const productos = await axios.get(`https://el-rastro-a7-backend.vercel.app/api/v2/productos?usuario=${correo}`, {
             headers: {
                 'authorization': token
             }
@@ -169,7 +169,7 @@ class ServiceUsuario {
     async checkValoracion(usuarioValorado, usuarioValorador, producto, token) {
         const foundValorado = await Usuario.findOne({correo: usuarioValorado})
         const foundValorador = await Usuario.findOne({correo: usuarioValorador})
-        const foundProducto = await axios.get(`http://localhost:5001/api/v2/productos/${producto}`, {
+        const foundProducto = await axios.get(`https://el-rastro-a7-backend.vercel.app/api/v2/productos/${producto}`, {
             headers: {
                 'authorization': token
             }

@@ -29,8 +29,7 @@ const createUsuarioController = async (req, res, next) => {
 
 const getUsuarioByIdController = async (req, res, next) => {
     try{
-        console.log('LLEGA')
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -141,7 +140,7 @@ const checkToken = async (req, res, next) => {
 
 const updateValoracionController = async (req, res, next) => {
     try{
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -162,7 +161,7 @@ const updateValoracionController = async (req, res, next) => {
 
 const getRatingUsuarioController = async (req, res, next) => {
     try{
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -181,7 +180,7 @@ const getRatingUsuarioController = async (req, res, next) => {
 
 const getValoracionUsuarioController = async (req, res, next) => {
     try{
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }

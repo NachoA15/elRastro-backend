@@ -7,7 +7,7 @@ const axios = require("axios");
 
 const listarProductos = async(req, res) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -33,7 +33,7 @@ const listarProductos = async(req, res) => {
 
 const filtrarProductos = async(req, res) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -55,7 +55,7 @@ const filtrarProductos = async(req, res) => {
 
 const listarProductosPorPujasUsuario = async(req, res) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -63,7 +63,7 @@ const listarProductosPorPujasUsuario = async(req, res) => {
         if(checkToken.status !== 200){
             res.status(checkToken.status).send(checkToken.data)
         }else {
-            const pujas = await axios.get(`http://localhost:5002/api/v2/pujas?usuario=${req.query.usuario}`)
+            const pujas = await axios.get(`https://el-rastro-a7-backend.vercel.app/api/v2/pujas?usuario=${req.query.usuario}`)
                 .then((result) => {
                     return result.data.pujas;
                 });
@@ -79,7 +79,7 @@ const listarProductosPorPujasUsuario = async(req, res) => {
 
 const guardarProducto = async(req, res) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -109,7 +109,7 @@ const guardarProducto = async(req, res) => {
                     });
                 }
             } else {
-                const usuario = await axios.get(`http://localhost:5003/api/v2/usuarios?correo=${req.body.usuario}`, {
+                const usuario = await axios.get(`https://el-rastro-a7-backend.vercel.app/api/v2/usuarios?correo=${req.body.usuario}`, {
                     headers: {
                         'authorization': req.headers.authorization
                     }
@@ -149,7 +149,7 @@ const guardarProducto = async(req, res) => {
 
 const borrarProducto = async (req, res) => {
     try {
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -159,7 +159,7 @@ const borrarProducto = async (req, res) => {
         }else{
         const producto = await serviceProducto.delete(req.params.id);
         if (producto) {
-            await axios.delete(`http://localhost:5002/api/v2/pujas?producto=${req.params.id}`, {
+            await axios.delete(`https://el-rastro-a7-backend.vercel.app/api/v2/pujas?producto=${req.params.id}`, {
                 headers: {
                     'authorization': req.headers.authorization
                 }
@@ -179,7 +179,7 @@ const borrarProducto = async (req, res) => {
 
 const reabrirSubastas = async () => {
     try{
-        let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
+        let checkToken = await axios.get("https://el-rastro-a7-backend.vercel.app/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
             }
@@ -217,7 +217,7 @@ const notificarCorreo = async () => {
             if(producto.puja && duracion <= 24*60*60*1000){
                 const vendedor = producto.usuario;
                 const comprador = producto.puja.usuario;
-                await axios.post('http://localhost:5005/api/v2/email/confirm',
+                await axios.post('https://el-rastro-a7-backend.vercel.app/api/v2/email/confirm',
                     {
                         producto: producto.nombre,
                         comprador: comprador,
