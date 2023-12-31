@@ -125,6 +125,7 @@ const checkToken = async (req, res, next) => {
             if(isValid.status === 200){
                 let user = await serviceUsuario.createOrUpdateUsuarioFromGoogle(isValid.res.token);
                 cache.push([isValid.res.token, parseInt(isValid.res.exp)]);
+                console.log("Cache: " + cache)
                 res.status(isValid.status).send({email: user.res, token: tokenToCheck});
             }else{
                 res.status(401).send("No autorizado");
