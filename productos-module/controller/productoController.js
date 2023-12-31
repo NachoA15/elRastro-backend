@@ -109,7 +109,11 @@ const guardarProducto = async(req, res) => {
                     });
                 }
             } else {
-                const usuario = await axios.get(`http://localhost:5003/api/v2/usuarios?correo=${req.body.usuario}`)
+                const usuario = await axios.get(`http://localhost:5003/api/v2/usuarios?correo=${req.body.usuario}`, {
+                    headers: {
+                        'authorization': req.headers.authorization
+                    }
+                })
                     .then((result) => {
                         return result.data;
                     })
@@ -155,7 +159,11 @@ const borrarProducto = async (req, res) => {
         }else{
         const producto = await serviceProducto.delete(req.params.id);
         if (producto) {
-            await axios.delete(`http://localhost:5002/api/v2/pujas?producto=${req.params.id}`);
+            await axios.delete(`http://localhost:5002/api/v2/pujas?producto=${req.params.id}`, {
+                headers: {
+                    'authorization': req.headers.authorization
+                }
+            });
             res.status(200).send({message: 'Producto ' + req.params.id + ' borrado con éxito', producto: producto});
         } else {
             res.status(400).send({message: 'No existe el producto ' + req.params.id});

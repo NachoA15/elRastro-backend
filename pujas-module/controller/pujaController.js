@@ -58,7 +58,7 @@ const guardarPuja = async (req, res) => {
 
                 res.status(200).send({message: 'Puja actualizada con éxito', puja: pujaActualizada});
             } else {
-                const check = await servicePuja.checkPuja(req.body.usuario, req.body.cantidad, req.body.producto);
+                const check = await servicePuja.checkPuja(req.body.usuario, req.body.cantidad, req.body.producto, req.headers.authorization);
                 if (check !== 'ok') {
                     res.status(409).send(check);
                 } else {
@@ -71,6 +71,10 @@ const guardarPuja = async (req, res) => {
                         {
                             id: req.body.producto,
                             puja: pujaCreada
+                        }, {
+                            headers: {
+                                'authorization': req.headers.authorization
+                            }
                         }
                     );
 
@@ -108,6 +112,10 @@ const borrarPuja = async (req, res) => {
                         {
                             id: puja.producto,
                             puja: nuevaPujaMasAlta
+                        }, {
+                            headers: {
+                                'authorization': req.headers.authorization
+                            }
                         }
                     );
                 } else if (pujasProducto[pujasProducto.length - 1].cantidad < puja.cantidad) {
@@ -116,6 +124,10 @@ const borrarPuja = async (req, res) => {
                         {
                             id: puja.producto,
                             puja: nuevaPujaMasAlta
+                        }, {
+                            headers: {
+                                'authorization': req.headers.authorization
+                            }
                         }
                     );
                 }
