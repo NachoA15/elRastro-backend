@@ -122,6 +122,7 @@ const checkToken = async (req, res, next) => {
             }
         } else {
             const isValid = await serviceUsuario.verifyGoogleToken(tokenToCheck);
+            console.log(isValid)
             if(isValid.status === 200){
                 let user = await serviceUsuario.createOrUpdateUsuarioFromGoogle(isValid.res.token);
                 cache.push([isValid.res.token, parseInt(isValid.res.exp)]);
