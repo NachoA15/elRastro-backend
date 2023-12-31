@@ -95,6 +95,16 @@ const checkTokenInCache =  async (req, res, next) => {
     }
 }
 
+const logOut = async (req, res, next) => {
+    const tokenIndex = cache.findIndex(([token, caducidad]) => token === req.headers.authorization)
+    if (tokenIndex !== -1) {
+        cache.splice(tokenIndex, 1);
+        return res.status(200).send("OK");
+    }else{
+        return res.status(401).send("Token no encontrado");
+    }
+}
+
 const checkToken = async (req, res, next) => {
     try{
         const tokenToCheck = req.headers.authorization
@@ -197,5 +207,6 @@ module.exports = {
     getRatingUsuarioController,
     getValoracionUsuarioController,
     checkToken,
-    checkTokenInCache
+    checkTokenInCache,
+    logOut
 }
