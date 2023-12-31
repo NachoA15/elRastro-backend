@@ -171,6 +171,7 @@ class ServiceUsuario {
             })
         const subastaClosed = foundProducto.puja;
         const currentDate = new Date();
+
         //const formatedDate = formatarFecha(currentDate)
 
         if (typeof foundValorado === 'undefined' || !foundValorado) {
@@ -179,7 +180,7 @@ class ServiceUsuario {
             return "El usuario que valora no existe";
         } else if (typeof foundProducto === 'undefined' || !foundProducto){
             return "El producto sobre el que se quiere valorar no existe";
-        }else if(foundProducto.fechaCierre < currentDate){
+        }else if(new Date(foundProducto.fechaCierre) < currentDate){
 
             const foundValoracion = foundValorado.valoracion.filter((val) => val.producto === producto && val.valorador === foundValorador.correo);
 
