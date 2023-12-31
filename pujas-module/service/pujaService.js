@@ -60,9 +60,13 @@ class ServicePuja {
      * @param cantidad
      * @param producto
      */
-    async checkPuja(usuario, cantidad, producto) {
+    async checkPuja(usuario, cantidad, producto, token) {
         const pujasProducto = await this.findByProduct(producto);
-        const foundProducto = await axios.get(`http://localhost:5001/api/v2/productos/${producto}`)
+        const foundProducto = await axios.get(`http://localhost:5001/api/v2/productos/${producto}`, {
+            headers: {
+                'authorization': token
+            }
+        })
             .then((result) => {
                 return result.data.producto;
             }

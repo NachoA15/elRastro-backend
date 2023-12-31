@@ -29,6 +29,7 @@ const createUsuarioController = async (req, res, next) => {
 
 const getUsuarioByIdController = async (req, res, next) => {
     try{
+        console.log('LLEGA')
         let checkToken = await axios.get("http://127.0.0.1:5003/api/v2/usuarios/checkLocalCache",{
             headers: {
                 'authorization': req.headers.authorization
@@ -56,7 +57,7 @@ const getUsuarioByIdController = async (req, res, next) => {
 
 const deleteUsuarioController = async (req, res, next) => {
     try{
-        const response = await serviceUsuario.deleteUsuario(req.params.correo)
+        const response = await serviceUsuario.deleteUsuario(req.params.correo, req.headers.authorization)
         res.status(response.status).send(response.res);
     }catch(error){
         res.status(500).send({success: false, message: error.message});
@@ -146,7 +147,7 @@ const updateValoracionController = async (req, res, next) => {
             }
         })
         if(checkToken.status !== 200) {
-            const response = await serviceUsuario.checkValoracion(req.body.valorado, req.body.valorador, req.body.producto)
+            const response = await serviceUsuario.checkValoracion(req.body.valorado, req.body.valorador, req.body.producto, req.headers.authorization)
             if (response !== "ok") {
                 res.status(400).send(response);
             } else {

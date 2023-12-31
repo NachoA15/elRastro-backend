@@ -59,8 +59,12 @@ class ServiceUsuario {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    async deleteUsuario(correo) {
-        const productos = await axios.get(`http://localhost:5001/api/v2/productos?usuario=${correo}`).then((result) => {
+    async deleteUsuario(correo, token) {
+        const productos = await axios.get(`http://localhost:5001/api/v2/productos?usuario=${correo}`, {
+            headers: {
+                'authorization': token
+            }
+        }).then((result) => {
             return result.data.productos;
         });
         if (productos.length !== 0) {
@@ -162,10 +166,14 @@ class ServiceUsuario {
 
     }
 
-    async checkValoracion(usuarioValorado, usuarioValorador, producto) {
+    async checkValoracion(usuarioValorado, usuarioValorador, producto, token) {
         const foundValorado = await Usuario.findOne({correo: usuarioValorado})
         const foundValorador = await Usuario.findOne({correo: usuarioValorador})
-        const foundProducto = await axios.get(`http://localhost:5001/api/v2/productos/${producto}`)
+        const foundProducto = await axios.get(`http://localhost:5001/api/v2/productos/${producto}`, {
+            headers: {
+                'authorization': token
+            }
+        })
             .then((result) => {
                 return result.data.producto;
             })
